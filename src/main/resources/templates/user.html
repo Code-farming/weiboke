@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>用户</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/css/mian.css">
+</head>
+<body class="lay-blog">
+<div th:insert="~{head :: head}"></div>
+<div class="container-wrap">
+    <div class="container">
+        <div class="contar-wrap">
+            <div class="item">
+                <div class="item-box">
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">用户名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="username" required lay-verify="required|username"
+                                       placeholder="请输入用户名" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">邮箱</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="email" required lay-verify="required|email"
+                                       placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">密码</label>
+                            <div class="layui-input-inline">
+                                <input type="password" name="password" required lay-verify="required|pass"
+                                       placeholder="请输入密码"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="login">登陆</button>
+                                <a href="/reg" class="layui-btn layui-btn-primary">注册用户</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:insert="~{foot :: foot}"></div>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/js/'
+    }).use('blog');
+</script>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        //各种基于事件的操作，下面会有进一步介绍
+        form.verify({
+            username: function (value, item) { //value：表单的值、item：表单的DOM对象
+                if (!new RegExp("^[a-zA-Z0-9_\u4e00-\u9fa5\\s·]+$").test(value)) {
+                    return '用户名不能有特殊字符';
+                }
+                if (/(^\_)|(\__)|(\_+$)/.test(value)) {
+                    return '用户名首尾不能出现下划线\'_\'';
+                }
+                if (/^\d+\d+\d$/.test(value)) {
+                    return '用户名不能全为数字';
+                }
+            }
+            ,
+            pass: [
+                /^[\S]{6,12}$/
+                , '密码必须6到12位，且不能出现空格'
+            ]
+        })
+        form.on('submit(login)', function (data) {
+            $.ajax({
+                url: '/login',
+                method: 'post',
+                data: data.field,
+                success: function (data) {
+                    if (data.code == 200) {
+                        layer.alert(data.msg, {
+                            title: '登录成功',
+                            time:1000
+                        })
+                        setTimeout(function (){window.location.href = "/note"},2000)
+                    }else{
+                        layer.alert(data.msg, {
+                            title: '登录失败',
+                            time:1000
+                        })
+                    }
+                }
+            })
+            return false;
+
+        });
+    });
+</script>
+</body>
+</html>
